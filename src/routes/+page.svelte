@@ -9,14 +9,8 @@
     let scannedProduct = "";
 
     client.on("connect", () => {
-        client.subscribe("presence", (err) => {
-            if (!err) {
-                client.publish("presence", "Hello mqtt");
-            }
-        });
+        client.subscribe("#");
     });
-
-    client.subscribe("#");
 
     client.on("message", (topic, message) => {
         // message is Buffer
