@@ -1,10 +1,12 @@
 <h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<p>Scanned product: {scannedProduct}</p>
 
 
 <script>
     import mqtt from "mqtt"
     let client = mqtt.connect("mqtt://localhost");
+
+    let scannedProduct = "";
 
     client.on("connect", () => {
         client.subscribe("presence", (err) => {
@@ -19,6 +21,7 @@
     client.on("message", (topic, message) => {
         // message is Buffer
         console.log(message.toString());
+        scannedProduct = message.toString();
         //client.end();
     });
     
