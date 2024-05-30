@@ -6,7 +6,7 @@
     import mqtt from "mqtt"
     let client = mqtt.connect("mqtt://localhost");
 
-    let scannedProduct = "";
+    $: scannedProduct = "";
 
     client.on("connect", () => {
         client.subscribe("#");
@@ -17,7 +17,6 @@
         //console.log(message.toString());
         scannedProduct = message.toString();
         console.log(scannedProduct);
-        scannedProduct = scannedProduct;
         client.end();
     });
     
