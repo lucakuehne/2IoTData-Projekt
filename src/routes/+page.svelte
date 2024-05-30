@@ -14,6 +14,8 @@
         });
     });
 
+    client.subscribe("#");
+
     client.on("message", (topic, message) => {
         // message is Buffer
         console.log(message.toString());
