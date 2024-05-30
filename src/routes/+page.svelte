@@ -17,6 +17,7 @@
         //console.log(message.toString());
         scannedProduct = message.toString();
         console.log(scannedProduct);
+        $scannedProduct = scannedProduct;
         client.end();
     });
     
