@@ -1,7 +1,3 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Scanned product: {scannedProduct}</p>
-
-
 <script>
     import mqtt from "mqtt"
     let client = mqtt.connect("mqtt://localhost");
@@ -21,3 +17,6 @@
     });
     
 </script>
+
+<h1>Welcome to SvelteKit</h1>
+<p>Scanned product: {scannedProduct}</p>
