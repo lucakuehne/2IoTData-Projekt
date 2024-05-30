@@ -20,9 +20,10 @@
 
     client.on("message", (topic, message) => {
         // message is Buffer
-        console.log(message.toString());
+        //console.log(message.toString());
         scannedProduct = message.toString();
-        //client.end();
+        console.log(scannedProduct);
+        client.end();
     });
     
 </script>
