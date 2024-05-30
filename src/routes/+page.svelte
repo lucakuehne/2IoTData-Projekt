@@ -18,5 +18,4 @@
     
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Scanned product: {scannedProduct}</p>
+<input bind:value={scannedProduct} />
