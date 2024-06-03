@@ -1,12 +1,11 @@
 <script>
     import mqtt from "mqtt"
-    import { MongoClient } from "mongodb"
+    //import { MongoClient } from "mongodb"
+    import { env } from '$env/dynamic/public'
     
-    const client = mqtt.connect("ws://192.168.10.131:9001");
-    const dbUser = "lucakuehne";
-    const dbPw = "ECcgJ55JPVgDYqQ5";
-    const dbUri = "mongodb+srv://lucakuehne:ECcgJ55JPVgDYqQ5@2iotdata.k4q2epp.mongodb.net/?retryWrites=true&w=majority&appName=2iotdata";
-    const dbClient = new MongoClient(dbUri);
+    //const client = mqtt.connect("ws://192.168.10.131:9001");
+    const client = mqtt.connect("ws://192.168.1.122:9001");
+    // const dbClient = new MongoClient(env.PUBLIC_DB_URI);
 
     let products;
 
@@ -28,25 +27,32 @@
     });
 
     async function getProducts() {
-        try {
-            const database = dbClient.db('2iotdata');
-            const productsCollection = database.collection('products');
-            //const query = { title: 'Back to the Future' };
-            //const product = await products.findOne(query);
-            products = await productsCollection.find({}).toArray();
+        const res = await fetch(
+            '/api',
+            { method: 'GET' }
+        );
+        const { products } = await res.json();
+
+        if (res.ok) {
             console.log(products);
-        } finally {
-            // Ensures that the client will close when you finish/error
-            await dbClient.close();
+            return {
+                props: {
+                    products
+                }
+            }
+        } else {
+            return {
+                status: res.status
+            }
         }
     }
 
-    getProducts()
+    //getProducts()
     
 </script>
 
-<div class="flex flex-row">
-    <div class="card m-4 p-4 w-1/5 bg-green-50 border-primary-300 border">
+<div class="flex gap-4 p-4">
+    <div class="card p-4 basis-1/4 flex-1 bg-green-50 border-primary-300 border">
         <h2 class="h3">Produkt hinzufügen</h2>
         <hr class="my-2" />
         <label class="label my-2">
@@ -68,7 +74,7 @@
         <button type="button" class="btn my-2 w-full bg-green-500">Hinzufügen</button>
     </div>
     
-    <div class="card m-4 p-4 w-1/5 bg-red-50 border-red-300 border">
+    <div class="card p-4 basis-1/4 flex-1 bg-red-50 border-red-300 border">
         <h2 class="h3">Produkt entnehmen</h2>
         <hr class="my-2" />
         <label class="label my-2">
@@ -102,7 +108,7 @@
         <button type="button" class="btn my-2 w-full bg-red-500">Entnehmen</button>
     </div>
 
-    <div class="card m-4 p-4 w-1/5 bg-blue-50 border-blue-300 border">
+    <div class="card p-4 basis-1/2 flex-1 bg-blue-50 border-blue-300 border">
         <h2 class="h3">Aktuelle Produkte</h2>
         <hr class="my-2" />
         <div class="card p-2 my-2">Artikel</div>
@@ -110,3 +116,5 @@
         <div class="card p-2 my-2">Artikel</div>
     </div>
 </div>
+
+<button class="btn border-solid border border-gray-800 hover:bg-gray-800" on:click={getProducts}>Load products</button>
