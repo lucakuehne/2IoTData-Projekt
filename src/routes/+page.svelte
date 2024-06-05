@@ -201,6 +201,7 @@
 
    onMount(() => {
 		listProducts();
+        axios.get("/api/doorsensor")
 	});
     
 </script>
