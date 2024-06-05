@@ -4,6 +4,10 @@ import { env } from '$env/dynamic/private'
 
 const dbClient = new MongoClient(env.DB_URI);
 
+export async function GET() {
+    
+}
+
 export async function POST({ request }) {
     let scan = await request.json()
     //console.log(scan.productName)
@@ -13,7 +17,8 @@ export async function POST({ request }) {
         const scansCollection = database.collection('scans');
             let createdScan = await scansCollection.insertOne({
                 productName: scan.productName,
-                fetched: false
+                fetched: false,
+                createdAt: new Date(Date.now())
             });
             return json({
                 status: 200,
