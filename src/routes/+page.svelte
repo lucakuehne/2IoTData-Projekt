@@ -5,6 +5,10 @@
     import { initializeStores, Toast, getToastStore, filter } from '@skeletonlabs/skeleton';
     initializeStores();
     import { Autocomplete } from '@skeletonlabs/skeleton';
+    import { popup } from '@skeletonlabs/skeleton';
+    import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+    import { storePopup } from '@skeletonlabs/skeleton';
+    storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
     
     //const client = mqtt.connect("ws://192.168.10.131:9001");
     const client = mqtt.connect("ws://192.168.1.122:9001");
@@ -12,6 +16,13 @@
 
     let products = [];
     let inventoryItems = [];
+
+    let addProductOptions = [];
+    const autocompletePopupSettings = {
+        event: 'focus-click',
+        target: 'popupAutocomplete',
+        placement: 'bottom'
+    }
     
     $: newProduct = {
         name: "",
@@ -77,6 +88,7 @@
             console.log(err);
         });
         listInventory();
+        loadProductOptions();
     }
 
     async function listInventory() {
@@ -160,6 +172,28 @@
         })
     }
 
+    async function loadProductOptions() {
+        while (products.length < 1) {
+            await sleep(500);
+        }
+        products.forEach(product => {
+            addProductOptions.push({
+                label: product.name,
+                value: product._id
+            });
+        });
+    }
+
+    function sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    function onAddProductSelection(event) {
+        newProduct.name = event.detail.label;
+    }
+
    onMount(() => {
 		listProducts();
 	});
@@ -177,13 +211,17 @@
     </div>
 </div>
 
-<div class="flex gap-4 p-4">
+<div class="flex gap-4 p-4 items-start">
     <div class="card p-4 basis-1/4 flex-1 bg-green-50 border-green-300 border">
         <h2 class="h3">Produkt hinzufügen</h2>
         <hr class="my-2" />
         <label class="label my-2">
             <span>Name</span>
-            <input class="input" title="produkt-Name" type="text" placeholder="Enter product name" bind:value={newProduct.name} />
+            <!-- <input class="input" title="produkt-Name" type="text" placeholder="Enter product name" bind:value={newProduct.name} /> -->
+            <input class="input autocomplete" type="search" bind:value={newProduct.name} placeholder="Produkt-Name eingeben" use:popup={autocompletePopupSettings}/>
+            <div class="card p-4" style="margin: 0px;" data-popup="popupAutocomplete">
+                <Autocomplete bind:input={newProduct.name} options={addProductOptions} on:selection={onAddProductSelection} />
+            </div>
         </label>
         <label class="label my-2">
             <span>Anzahl</span>
