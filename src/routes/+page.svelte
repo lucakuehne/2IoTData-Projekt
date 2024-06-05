@@ -43,15 +43,15 @@
     });
 
     client.on("message", (topic, message) => {
-        console.log(topic + " => " + message);
-        // message is Buffer
-        if (topic == "doorsensor/newstate") {
-            console.log("Door state has changed!")
-        } else {
+        // console.log(topic + " => " + message);
+        // // message is Buffer
+        // if (topic == "doorsensor/newstate") {
+        //     console.log("Door state has changed!")
+        // } else {
             newProduct.name = message.toString();
             console.log(newProduct.name);
             newProduct.name = newProduct.name;
-        }
+        // }
     });
 
     function clearNewProduct() {
@@ -189,20 +189,20 @@
         });
     }
 
-    async function loadNewScans() {
-        while (true) {
-            axios.get("/api/barcodescanner")
-            .then(function (res) {
-                if (res.status == 200) {
-                    newProduct.name = res.data.body
-                }
-            })
-            .catch(function (err) {
-                console.log(err);
-            })
-            await sleep(500);
-        }
-    }
+    // async function loadNewScans() {
+    //     while (true) {
+    //         axios.get("/api/barcodescanner")
+    //         .then(function (res) {
+    //             if (res.status == 200) {
+    //                 newProduct.name = res.data.body
+    //             }
+    //         })
+    //         .catch(function (err) {
+    //             console.log(err);
+    //         })
+    //         await sleep(500);
+    //     }
+    // }
 
     function sleep(ms) {
         return new Promise((resolve) => {
@@ -216,7 +216,7 @@
 
    onMount(() => {
 		listProducts();
-        loadNewScans();
+        // loadNewScans();
 	});
     
 </script>
