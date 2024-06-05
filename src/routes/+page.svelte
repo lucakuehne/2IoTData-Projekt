@@ -153,7 +153,7 @@
         .then(function (iRes) {
             console.log(iRes.data);
             if (iRes.status == 200 || iRes.status == 201) {
-                clearNewProduct();
+                clearProductToRemove();
                 toastStore.trigger({
                     message: 'Produkt wurde erfolgreich entfernt',
                     background: 'bg-green-500'
