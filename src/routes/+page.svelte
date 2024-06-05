@@ -173,6 +173,7 @@
     }
 
     async function loadProductOptions() {
+        addProductOptions = [];
         while (products.length < 1) {
             await sleep(500);
         }
