@@ -189,6 +189,21 @@
         });
     }
 
+    async function loadNewScans() {
+        while (true) {
+            axios.get("/api/barcodescanner")
+            .then(function (res) {
+                if (res.status == 200) {
+                    newProduct.name = res.data.body
+                }
+            })
+            .catch(function (err) {
+                console.log(err);
+            })
+            await sleep(500);
+        }
+    }
+
     function sleep(ms) {
         return new Promise((resolve) => {
             setTimeout(resolve, ms);
@@ -201,6 +216,7 @@
 
    onMount(() => {
 		listProducts();
+        loadNewScans();
 	});
     
 </script>
