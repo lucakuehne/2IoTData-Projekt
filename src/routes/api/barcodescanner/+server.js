@@ -11,13 +11,13 @@ export async function POST({ request }) {
         await dbClient.connect();
         const database = dbClient.db('2iotdata');
         const scansCollection = database.collection('scans');
-            let scan = await scansCollection.insertOne({
+            let createdScan = await scansCollection.insertOne({
                 productName: scan.productName,
                 fetched: false
             });
             return json({
                 status: 200,
-                body: scan
+                body: createdScan
             });
     } catch (exceptionVar) {
         console.log(exceptionVar);
