@@ -10,8 +10,10 @@
     import { storePopup } from '@skeletonlabs/skeleton';
     storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
     
-    //const client = mqtt.connect("ws://192.168.10.131:9001");
-    const client = mqtt.connect("ws://192.168.1.122:9001");
+    //const client = mqtt.connect("ws://192.168.10.131:9001"); //IWS
+    //const client = mqtt.connect("ws://192.168.1.122:9001"); //Wald
+    //const client = mqtt.connect("ws://192.168.47.145:9001"); //Hotspot Ale
+    const client = mqtt.connect("ws://localhost:9001"); //localhost
     const toastStore = getToastStore();
 
     let products = [];
