@@ -5619,10 +5619,6 @@ a.\!chip:hover,
   border-top-width: 1px;
 }
 
-.border-solid {
-  border-style: solid;
-}
-
 .border-dashed {
   border-style: dashed;
 }
@@ -5630,11 +5626,6 @@ a.\!chip:hover,
 .border-blue-300 {
   --tw-border-opacity: 1;
   border-color: rgb(147 197 253 / var(--tw-border-opacity));
-}
-
-.border-gray-800 {
-  --tw-border-opacity: 1;
-  border-color: rgb(31 41 55 / var(--tw-border-opacity));
 }
 
 .border-primary-300 {
@@ -5645,16 +5636,6 @@ a.\!chip:hover,
 .border-red-300 {
   --tw-border-opacity: 1;
   border-color: rgb(252 165 165 / var(--tw-border-opacity));
-}
-
-.border-gray-600 {
-  --tw-border-opacity: 1;
-  border-color: rgb(75 85 99 / var(--tw-border-opacity));
-}
-
-.border-l-gray-800 {
-  --tw-border-opacity: 1;
-  border-left-color: rgb(31 41 55 / var(--tw-border-opacity));
 }
 
 .bg-black {
@@ -5717,16 +5698,6 @@ a.\!chip:hover,
 
 .bg-white\/75 {
   background-color: rgb(255 255 255 / 0.75);
-}
-
-.bg-gray-800 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
-}
-
-.bg-red-300 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(252 165 165 / var(--tw-bg-opacity));
 }
 
 .fill-current {
@@ -5830,6 +5801,10 @@ a.\!chip:hover,
   text-align: start;
 }
 
+.align-middle {
+  vertical-align: middle;
+}
+
 .\!text-sm {
   font-size: 0.875rem !important;
   line-height: 1.25rem !important;
@@ -5865,6 +5840,10 @@ a.\!chip:hover,
 
 .uppercase {
   text-transform: uppercase;
+}
+
+.lowercase {
+  text-transform: lowercase;
 }
 
 .\!text-white {
@@ -7875,11 +7854,6 @@ a.\!chip:hover,
 
 :is(.dark .hover\:variant-soft:hover) {
   background-color: rgb(var(--color-surface-500) / 0.2);
-}
-
-.hover\:bg-gray-800:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
 }
 
 .hover\:opacity-100:hover {

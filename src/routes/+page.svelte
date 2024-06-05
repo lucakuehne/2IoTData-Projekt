@@ -1,8 +1,8 @@
 <script>
     import { onMount } from 'svelte';
-    import mqtt from "mqtt"
-    import axios from "axios"
-    import { initializeStores, Toast, getToastStore } from '@skeletonlabs/skeleton';
+    import mqtt from "mqtt";
+    import axios from "axios";
+    import { initializeStores, Toast, getToastStore, filter } from '@skeletonlabs/skeleton';
     initializeStores();
     import { Autocomplete } from '@skeletonlabs/skeleton';
     
@@ -11,6 +11,7 @@
     const toastStore = getToastStore();
 
     let products = [];
+    let inventoryItems = [];
     
     $: newProduct = {
         name: "",
@@ -20,8 +21,10 @@
 
     $: productToRemove = {
         name: "",
+        productId: "",
+        inventoryId: "",
         amount: 0,
-        expirationDate: ""
+        expirationDate: "",
     };
 
     client.on("connect", () => {
@@ -44,6 +47,8 @@
 
     function setProductToRemove(product, inventoryItem) {
         productToRemove.name = product.name
+        productToRemove.productId = product._id
+        productToRemove.inventoryId = inventoryItem._id
         productToRemove.expirationDate = inventoryItem.expirationDate
     }
 
@@ -56,7 +61,6 @@
     async function listProducts() {
         axios.get("/api/products")
         .then(function (res) {
-            console.log(res.data);
             products = res.data.body.sort((a, b) => {
                 const nameA = a.name.toUpperCase(); // ignore upper and lowercase
                 const nameB = b.name.toUpperCase(); // ignore upper and lowercase
@@ -72,35 +76,91 @@
         .catch(function (err) {
             console.log(err);
         });
+        listInventory();
+    }
+
+    async function listInventory() {
+        axios.get("/api/inventory")
+        .then(function (res) {
+            inventoryItems = res.data.body.sort((a, b) => {
+                if (a.expirationDate < b.expirationDate) {
+                    return -1;
+                }
+                if (a.expirationDate > b.expirationDate) {
+                    return 1;
+                }
+                return 0;
+            });
+            inventoryItems = inventoryItems;
+        })
     }
 
     async function addProduct() {
         axios.post("/api/products", newProduct)
-        .then(function (res) {
-            //console.log(res.data);
-            if (res.status == 200) {
-                clearNewProduct();
-                toastStore.trigger({
-                    message: 'Product added successfully',
-                    background: 'bg-green-500'
-                });
-                listProducts();
+        .then(function (pRes) {
+            if (pRes.status == 200 || pRes.status == 201) {
+                let productId = pRes.data.body;
+                let updatedNewProduct = newProduct;
+                updatedNewProduct.productId = productId;
+                axios.post("/api/inventory/", updatedNewProduct)
+                .then(function (iRes) {
+                    if (iRes.status == 200 || iRes.status == 201) {
+                        clearNewProduct();
+                        toastStore.trigger({
+                            message: 'Produkt wurde erfolgreich hinzugefügt',
+                            background: 'bg-green-500'
+                        });
+                        listProducts();
+                    }
+                })
+                .catch(function (iErr) {
+                    toastStore.trigger({
+                            message: 'Fehler beim Hinzufügen des Produkts',
+                            background: 'bg-red-500'
+                    });
+                    console.log("Error when adding inventory: " + iErr)
+                })
             }
         })
-        .catch(function (err) {
-            console.log(err);
+        .catch(function (pErr) {
+            toastStore.trigger({
+                message: 'Fehler beim Hinzufügen des Produkts',
+                background: 'bg-red-500'
+            });
+            console.log("Error when adding prduct: " + pErr);
         });
     }
 
     async function removeProduct() {
         //console.log(productToRemove);
-        axios.delete("/api/products", { data: productToRemove })
-        .then(function (res) {
-            console.log(res.data);
+        axios.delete("/api/inventory", { data: productToRemove })
+        .then(function (iRes) {
+            console.log(iRes.data);
+            if (iRes.status == 200 || iRes.status == 201) {
+                clearNewProduct();
+                toastStore.trigger({
+                    message: 'Produkt wurde erfolgreich entfernt',
+                    background: 'bg-green-500'
+                });
+                listProducts();
+            } else {
+                toastStore.trigger({
+                        message: 'Fehler beim Entfernen des Produkts',
+                        background: 'bg-red-500'
+                });
+                console.log("Error when removing inventory: " + iRes.message)
+            }
+        })
+        .catch(function (iErr) {
+            toastStore.trigger({
+                    message: 'Fehler beim Entfernen des Produkts',
+                    background: 'bg-red-500'
+            });
+            console.log("Error when removing inventory: " + iErr)
         })
     }
 
-    onMount(() => {
+   onMount(() => {
 		listProducts();
 	});
     
@@ -109,7 +169,16 @@
 <Toast />
 
 <div class="flex gap-4 p-4">
-    <div class="card p-4 basis-1/4 flex-1 bg-green-50 border-primary-300 border">
+    <div class="card p-4 flex-1 flex items-center justify-center gap-2">
+        <span class="font-bold">Die Temperatur ist:</span><span>XY °C</span>
+    </div>
+    <div class="card p-4 flex-1 flex items-center justify-center gap-2">
+        <span class="font-bold">Der Kühlschrank ist:</span><span>offen / geschlossen</span>
+    </div>
+</div>
+
+<div class="flex gap-4 p-4">
+    <div class="card p-4 basis-1/4 flex-1 bg-green-50 border-green-300 border">
         <h2 class="h3">Produkt hinzufügen</h2>
         <hr class="my-2" />
         <label class="label my-2">
@@ -135,25 +204,29 @@
         <h2 class="h3">Aktuelle Produkte</h2>
         <hr class="my-2" />
         {#each products as product}
-            <div class="card p-2 my-2">
-                <b>{product.name} (x{product.amount}):</b>
-                <ul>
-                    {#each product.inventory as inventoryItem}
-                        <li>
-                            {inventoryItem.expirationDate} (x{inventoryItem.amount})
-                            <button class="btn p-0 px-4 bg-red-500" on:click={setProductToRemove(product, inventoryItem)}>→</button>
-                        </li>
-                    {/each}
-                </ul>
-            </div>
+            {#if inventoryItems.filter(item => item._id == product._id).length > 0}
+                <div class="card p-2 my-2">
+                    <span class="font-bold">{product.name} (x{inventoryItems.filter(item => item._id == product._id)[0].totalAmount}):</span>
+                    <ul>
+                        {#each inventoryItems.filter(item => item._id == product._id) as productInventory}
+                            {#each productInventory.inventory as inventoryItem}
+                                <li>
+                                    {inventoryItem.expirationDate} (x{inventoryItem.amount})
+                                    <button class="btn p-0 px-4 bg-red-500" on:click={setProductToRemove(product, inventoryItem)}>→</button>
+                                </li>
+                            {/each}
+                        {/each}
+                    </ul>
+                </div>
+            {/if}
         {/each}
     </div>
 
     <div class="card p-4 basis-1/4 flex-1 bg-red-50 border-red-300 border">
         <h2 class="h3">Produkt entnehmen</h2>
         <hr class="my-2" />
-        {#if productToRemove.name == null}
-            <span class="text-center inline-block align-middle">Bitte wählen Sie links ein Produkt, um es entfernen zu können.</span>
+        {#if productToRemove.name == ""}
+            <span class="text-center">Bitte wählen Sie links ein Produkt, um es entfernen zu können.</span>
         {:else}
             <b>Name:</b>
             <p>{ productToRemove.name }</p>
@@ -172,4 +245,5 @@
             <button type="button" class="btn my-2 w-full bg-red-500" on:click={removeProduct}>Entnehmen</button>
         {/if}
     </div>
+
 </div>
