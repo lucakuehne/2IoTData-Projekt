@@ -11,7 +11,7 @@ export async function GET() {
         const scansCollection = database.collection('scans');
         let oldestScan = await scansCollection.findOne({ fetched: false }, null, { sort: { cretedAt: -1} });
         let test = await scansCollection.updateOne({ fetched: false }, { $set: { fetched: true } }, { sort: { cretedAt: -1} })
-        console.log(test);
+        //console.log(test);
         if (oldestScan == null) {
             return json({
                 status: 200,
