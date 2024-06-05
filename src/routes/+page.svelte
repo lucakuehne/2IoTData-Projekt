@@ -43,11 +43,15 @@
     });
 
     client.on("message", (topic, message) => {
+        console.log(topic + " => " + message);
         // message is Buffer
-        newProduct.name = message.toString();
-        console.log(newProduct.name);
-        newProduct.name = newProduct.name;
-        //client.end();
+        if (topic == "doorsensor/newstate") {
+            console.log("Door state has changed!")
+        } else {
+            newProduct.name = message.toString();
+            console.log(newProduct.name);
+            newProduct.name = newProduct.name;
+        }
     });
 
     function clearNewProduct() {
